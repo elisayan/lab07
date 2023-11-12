@@ -4,6 +4,7 @@ import it.unibo.functional.api.Function;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,10 +29,7 @@ public final class Transformers {
      * @param <I> input elements type
      * @param <O> output elements type
      */
-    public static <I, O> List<O> flattenTransform(
-        final Iterable<? extends I> base,
-        final Function<I, ? extends Collection<? extends O>> transformer
-    ) {
+    public static <I, O> List<O> flattenTransform(final Iterable<? extends I> base, final Function<I, ? extends Collection<? extends O>> transformer) {
         final var result = new ArrayList<O>();
         for (final I input : Objects.requireNonNull(base, "The base iterable cannot be null")) {
             result.addAll(transformer.call(input));
@@ -54,7 +52,14 @@ public final class Transformers {
      * @param <O> output elements type
      */
     public static <I, O> List<O> transform(final Iterable<I> base, final Function<I, O> transformer) {
-        return null;
+        return flattenTransform(base, new Function<I,List<? extends O>>() {
+
+            @Override
+            public List<? extends O> call(I input) {
+                return List.of(transformer.call(input));
+            }
+            
+        });
     }
 
     /**
